@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_171hlp3" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.26.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:collaboration id="Collaboration_13otxn6">
+    <bpmn:participant id="CheckForNewReleasesParticipant" name="Check for new releases" processRef="check-new-releases" />
+  </bpmn:collaboration>
+  <bpmn:process id="check-new-releases" name="check-new-releases" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0ziouk1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="GetArtistsForUserTask" name="Get artists for user" camunda:asyncBefore="true" camunda:expression="${artistService.getArtistsForUser(execution)}">
+      <bpmn:incoming>Flow_0ziouk1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ucxdhv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0x9lmf0">
+      <bpmn:incoming>Flow_0ucxdhv</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ziouk1" sourceRef="StartEvent_1" targetRef="GetArtistsForUserTask" />
+    <bpmn:sequenceFlow id="Flow_0ucxdhv" sourceRef="GetArtistsForUserTask" targetRef="Event_0x9lmf0" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_13otxn6">
+      <bpmndi:BPMNShape id="Participant_1uizbx8_di" bpmnElement="CheckForNewReleasesParticipant" isHorizontal="true">
+        <dc:Bounds x="129" y="80" width="871" height="590" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="389" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bmxpxx_di" bpmnElement="GetArtistsForUserTask">
+        <dc:Bounds x="270" y="367" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0x9lmf0_di" bpmnElement="Event_0x9lmf0">
+        <dc:Bounds x="432" y="389" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0ziouk1_di" bpmnElement="Flow_0ziouk1">
+        <di:waypoint x="215" y="407" />
+        <di:waypoint x="270" y="407" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ucxdhv_di" bpmnElement="Flow_0ucxdhv">
+        <di:waypoint x="370" y="407" />
+        <di:waypoint x="432" y="407" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
