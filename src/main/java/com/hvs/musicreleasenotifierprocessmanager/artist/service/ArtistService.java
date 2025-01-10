@@ -1,4 +1,4 @@
-package com.hvs.camundamicroserviceplayground.artist.service;
+package com.hvs.musicreleasenotifierprocessmanager.artist.service;
 
 import org.camunda.bpm.engine.runtime.Execution;
 import org.springframework.stereotype.Service;
