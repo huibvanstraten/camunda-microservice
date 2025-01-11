@@ -4,56 +4,57 @@
     <bpmn:participant id="GetArtistsForUserParticipant" name="Get all artists for user" processRef="get-artists-for-user" />
   </bpmn:collaboration>
   <bpmn:process id="get-artists-for-user" name="get-artists-for-user" isExecutable="true">
-    <bpmn:sequenceFlow id="Flow_19l38rl" sourceRef="Activity_12a21nl" targetRef="Gateway_1jn41ia" />
-    <bpmn:subProcess id="Activity_12a21nl" name="For each Artist Id">
-      <bpmn:incoming>Flow_0h0a8rn</bpmn:incoming>
-      <bpmn:outgoing>Flow_19l38rl</bpmn:outgoing>
-      <bpmn:startEvent id="Event_1jgtn1p">
-        <bpmn:outgoing>Flow_071k8au</bpmn:outgoing>
-      </bpmn:startEvent>
-      <bpmn:sequenceFlow id="Flow_071k8au" sourceRef="Event_1jgtn1p" targetRef="Activity_13t3xpd" />
-      <bpmn:serviceTask id="Activity_13t3xpd" name="Get Artist data" camunda:expression="${newReleasesProcessService.print(execution)}">
-        <bpmn:incoming>Flow_071k8au</bpmn:incoming>
-        <bpmn:outgoing>Flow_0buusoj</bpmn:outgoing>
-      </bpmn:serviceTask>
-      <bpmn:sequenceFlow id="Flow_0buusoj" sourceRef="Activity_13t3xpd" targetRef="Activity_1btvwvo" />
-      <bpmn:boundaryEvent id="Event_0qck5uz" attachedToRef="Activity_13t3xpd">
-        <bpmn:outgoing>Flow_033bgex</bpmn:outgoing>
-        <bpmn:errorEventDefinition id="ErrorEventDefinition_1wu84eo" errorRef="Error_1eixchp" />
-      </bpmn:boundaryEvent>
-      <bpmn:sequenceFlow id="Flow_033bgex" sourceRef="Event_0qck5uz" targetRef="Event_0w8i5vd" />
-      <bpmn:endEvent id="Event_17p6igw">
-        <bpmn:incoming>Flow_1moqhgl</bpmn:incoming>
-      </bpmn:endEvent>
-      <bpmn:sequenceFlow id="Flow_1moqhgl" sourceRef="Activity_1btvwvo" targetRef="Event_17p6igw" />
-      <bpmn:serviceTask id="Activity_1btvwvo" name="Add relevant artist data to" camunda:expression="${true}">
-        <bpmn:incoming>Flow_0buusoj</bpmn:incoming>
-        <bpmn:outgoing>Flow_1moqhgl</bpmn:outgoing>
-      </bpmn:serviceTask>
-      <bpmn:endEvent id="Event_0w8i5vd">
-        <bpmn:incoming>Flow_033bgex</bpmn:incoming>
-        <bpmn:messageEventDefinition id="MessageEventDefinition_1hge7ti" messageRef="Message_1lcaggk" />
-      </bpmn:endEvent>
-    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_19l38rl" sourceRef="ForEachArtistIdSubProces" targetRef="Gateway_1jn41ia" />
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_0h0a8rn</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_0h0a8rn" sourceRef="StartEvent_1" targetRef="Activity_12a21nl" />
-    <bpmn:boundaryEvent id="Event_16wvv1z" cancelActivity="false" attachedToRef="Activity_12a21nl">
-      <bpmn:outgoing>Flow_0gyvqdj</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0p6uzz0" messageRef="Message_1lcaggk" />
-    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0h0a8rn" sourceRef="StartEvent_1" targetRef="GetListsTask" />
     <bpmn:sequenceFlow id="Flow_0gyvqdj" sourceRef="Event_16wvv1z" targetRef="Activity_0ijwj4i" />
+    <bpmn:sequenceFlow id="Flow_1mjs6z5" sourceRef="Activity_0ijwj4i" targetRef="Gateway_1jn41ia" />
+    <bpmn:sequenceFlow id="Flow_1qu18ad" sourceRef="Gateway_1jn41ia" targetRef="Event_1w6euts" />
     <bpmn:endEvent id="Event_1w6euts">
       <bpmn:incoming>Flow_1qu18ad</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1mjs6z5" sourceRef="Activity_0ijwj4i" targetRef="Gateway_1jn41ia" />
-    <bpmn:sequenceFlow id="Flow_1qu18ad" sourceRef="Gateway_1jn41ia" targetRef="Event_1w6euts" />
     <bpmn:exclusiveGateway id="Gateway_1jn41ia">
       <bpmn:incoming>Flow_1mjs6z5</bpmn:incoming>
       <bpmn:incoming>Flow_19l38rl</bpmn:incoming>
       <bpmn:outgoing>Flow_1qu18ad</bpmn:outgoing>
     </bpmn:exclusiveGateway>
+    <bpmn:subProcess id="ForEachArtistIdSubProces" name="For each Artist Id">
+      <bpmn:incoming>Flow_16mlljx</bpmn:incoming>
+      <bpmn:outgoing>Flow_19l38rl</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:collection="artistIdList" camunda:elementVariable="artistId" />
+      <bpmn:startEvent id="Event_1jgtn1p">
+        <bpmn:outgoing>Flow_071k8au</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_071k8au" sourceRef="Event_1jgtn1p" targetRef="GetArtistDataTask" />
+      <bpmn:serviceTask id="GetArtistDataTask" name="Get Artist data" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:expression="${getArtistsForUserProcessService.getArtist(execution)}">
+        <bpmn:incoming>Flow_071k8au</bpmn:incoming>
+        <bpmn:outgoing>Flow_0buusoj</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_0buusoj" sourceRef="GetArtistDataTask" targetRef="Event_17p6igw" />
+      <bpmn:boundaryEvent id="Event_0qck5uz" attachedToRef="GetArtistDataTask">
+        <bpmn:outgoing>Flow_033bgex</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_1wu84eo" errorRef="Error_1eixchp" />
+      </bpmn:boundaryEvent>
+      <bpmn:sequenceFlow id="Flow_033bgex" sourceRef="Event_0qck5uz" targetRef="Event_0w8i5vd" />
+      <bpmn:endEvent id="Event_17p6igw">
+        <bpmn:incoming>Flow_0buusoj</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:endEvent id="Event_0w8i5vd">
+        <bpmn:incoming>Flow_033bgex</bpmn:incoming>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_1hge7ti" messageRef="Message_1lcaggk" />
+      </bpmn:endEvent>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent id="Event_16wvv1z" cancelActivity="false" attachedToRef="ForEachArtistIdSubProces">
+      <bpmn:outgoing>Flow_0gyvqdj</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0p6uzz0" messageRef="Message_1lcaggk" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_16mlljx" sourceRef="GetListsTask" targetRef="ForEachArtistIdSubProces" />
+    <bpmn:serviceTask id="GetListsTask" name="get artist ID list and set Artist Data List" camunda:asyncAfter="true" camunda:expression="${getArtistsForUserProcessService.setLists(execution)}">
+      <bpmn:incoming>Flow_0h0a8rn</bpmn:incoming>
+      <bpmn:outgoing>Flow_16mlljx</bpmn:outgoing>
+    </bpmn:serviceTask>
     <bpmn:serviceTask id="Activity_0ijwj4i" name="Throw error?" camunda:expression="${true}">
       <bpmn:incoming>Flow_0gyvqdj</bpmn:incoming>
       <bpmn:outgoing>Flow_1mjs6z5</bpmn:outgoing>
@@ -65,83 +66,84 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0wedlgj">
       <bpmndi:BPMNShape id="Participant_1viiydt_di" bpmnElement="GetArtistsForUserParticipant" isHorizontal="true">
-        <dc:Bounds x="120" y="80" width="1070" height="460" />
+        <dc:Bounds x="120" y="80" width="1020" height="460" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="179" y="242" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0ovk40z_di" bpmnElement="Activity_0ijwj4i">
-        <dc:Bounds x="870" y="450" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1w6euts_di" bpmnElement="Event_1w6euts">
-        <dc:Bounds x="1072" y="242" width="36" height="36" />
+        <dc:Bounds x="1022" y="242" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1jn41ia_di" bpmnElement="Gateway_1jn41ia" isMarkerVisible="true">
-        <dc:Bounds x="895" y="235" width="50" height="50" />
+        <dc:Bounds x="845" y="235" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_12a21nl_di" bpmnElement="Activity_12a21nl" isExpanded="true">
-        <dc:Bounds x="280" y="160" width="520" height="250" />
+      <bpmndi:BPMNShape id="Activity_0ovk40z_di" bpmnElement="Activity_0ijwj4i">
+        <dc:Bounds x="820" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0b0e090_di" bpmnElement="GetListsTask">
+        <dc:Bounds x="250" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_12a21nl_di" bpmnElement="ForEachArtistIdSubProces" isExpanded="true">
+        <dc:Bounds x="390" y="160" width="360" height="250" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1jgtn1p_di" bpmnElement="Event_1jgtn1p">
-        <dc:Bounds x="320" y="242" width="36" height="36" />
+        <dc:Bounds x="430" y="242" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0fimhne_di" bpmnElement="Activity_13t3xpd">
-        <dc:Bounds x="410" y="220" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_0fimhne_di" bpmnElement="GetArtistDataTask">
+        <dc:Bounds x="520" y="220" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_17p6igw_di" bpmnElement="Event_17p6igw">
-        <dc:Bounds x="732" y="242" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_02y1sg2_di" bpmnElement="Activity_1btvwvo">
-        <dc:Bounds x="570" y="220" width="100" height="80" />
+        <dc:Bounds x="682" y="242" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_156fc71_di" bpmnElement="Event_0w8i5vd">
-        <dc:Bounds x="732" y="332" width="36" height="36" />
+        <dc:Bounds x="682" y="332" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1s5woon_di" bpmnElement="Event_0qck5uz">
-        <dc:Bounds x="492" y="282" width="36" height="36" />
+        <dc:Bounds x="602" y="282" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_071k8au_di" bpmnElement="Flow_071k8au">
-        <di:waypoint x="356" y="260" />
-        <di:waypoint x="410" y="260" />
+        <di:waypoint x="466" y="260" />
+        <di:waypoint x="520" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0buusoj_di" bpmnElement="Flow_0buusoj">
-        <di:waypoint x="510" y="260" />
-        <di:waypoint x="570" y="260" />
+        <di:waypoint x="620" y="260" />
+        <di:waypoint x="682" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_033bgex_di" bpmnElement="Flow_033bgex">
-        <di:waypoint x="510" y="318" />
-        <di:waypoint x="510" y="350" />
-        <di:waypoint x="732" y="350" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1moqhgl_di" bpmnElement="Flow_1moqhgl">
-        <di:waypoint x="670" y="260" />
-        <di:waypoint x="732" y="260" />
+        <di:waypoint x="620" y="318" />
+        <di:waypoint x="620" y="350" />
+        <di:waypoint x="682" y="350" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_058rolj_di" bpmnElement="Event_16wvv1z">
-        <dc:Bounds x="782" y="392" width="36" height="36" />
+        <dc:Bounds x="732" y="392" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_19l38rl_di" bpmnElement="Flow_19l38rl">
-        <di:waypoint x="800" y="260" />
-        <di:waypoint x="895" y="260" />
+        <di:waypoint x="750" y="260" />
+        <di:waypoint x="845" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0h0a8rn_di" bpmnElement="Flow_0h0a8rn">
         <di:waypoint x="215" y="260" />
-        <di:waypoint x="280" y="260" />
+        <di:waypoint x="250" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0gyvqdj_di" bpmnElement="Flow_0gyvqdj">
-        <di:waypoint x="800" y="428" />
-        <di:waypoint x="800" y="490" />
-        <di:waypoint x="870" y="490" />
+        <di:waypoint x="750" y="428" />
+        <di:waypoint x="750" y="440" />
+        <di:waypoint x="870" y="440" />
+        <di:waypoint x="870" y="390" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1mjs6z5_di" bpmnElement="Flow_1mjs6z5">
-        <di:waypoint x="920" y="450" />
-        <di:waypoint x="920" y="285" />
+        <di:waypoint x="870" y="310" />
+        <di:waypoint x="870" y="285" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1qu18ad_di" bpmnElement="Flow_1qu18ad">
-        <di:waypoint x="945" y="260" />
-        <di:waypoint x="1072" y="260" />
+        <di:waypoint x="895" y="260" />
+        <di:waypoint x="1022" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16mlljx_di" bpmnElement="Flow_16mlljx">
+        <di:waypoint x="350" y="260" />
+        <di:waypoint x="390" y="260" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

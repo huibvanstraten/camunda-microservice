@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ArtistService {
 
-    public void getArtistsForUser(Execution execution) {
-        System.out.println("Executing getArtistsForUser");
+    public void getArtistForUser(Execution execution) {
+
     }
+
+
 }
