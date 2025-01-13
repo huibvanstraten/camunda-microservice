@@ -31,6 +31,4 @@ public class NewReleasesResource {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-
 }
