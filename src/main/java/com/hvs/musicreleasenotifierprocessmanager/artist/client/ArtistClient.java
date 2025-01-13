@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hvs.musicreleasenotifierprocessmanager.artist.dto.ArtistDto;
-import com.hvs.musicreleasenotifierprocessmanager.user.client.response.UserPageResponse;
-import com.hvs.musicreleasenotifierprocessmanager.user.dto.UserDto;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,12 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @Component
 public class ArtistClient {
@@ -55,7 +51,7 @@ public class ArtistClient {
             return objectMapper.readValue(responseBody, new TypeReference<>() {});
         } else {
             logger.error("Failed to fetch artist. Status Code: {}, Body: {}", response.statusCode(), response.body());
-            throw new IOException("Failed to fetch artist. Status Code: " + response.statusCode());
+            throw new BpmnError("FetchArtistDataError", "Failed to fetch artist");
         }
     }
 }

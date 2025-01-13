@@ -21,10 +21,12 @@ public class GetArtistsForUserProcessService {
     private static final Logger logger = LoggerFactory.getLogger(GetArtistsForUserProcessService.class);
 
     private final ArtistClient artistClient;
+    private final RuntimeService runtimeService;
 
     @Autowired
     public GetArtistsForUserProcessService(ArtistClient artistClient, RuntimeService runtimeService) {
         this.artistClient = artistClient;
+        this.runtimeService = runtimeService;
     }
 
     public void setLists(DelegateExecution execution) {
@@ -47,5 +49,12 @@ public class GetArtistsForUserProcessService {
         for(ArtistDto artist : artistDataList) {
             System.out.println(artist.getName());
         }
+    }
+
+    public void message(DelegateExecution execution, String message) {
+        runtimeService.createMessageCorrelation(message)
+                .processInstanceId(execution.getProcessInstanceId())
+                .setVariable("artistId", execution.getVariable("artistId"))
+                .correlate();
     }
 }

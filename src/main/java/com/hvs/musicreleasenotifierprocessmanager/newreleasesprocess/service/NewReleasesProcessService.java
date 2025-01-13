@@ -1,5 +1,7 @@
 package com.hvs.musicreleasenotifierprocessmanager.newreleasesprocess.service;
 
+import com.hvs.musicreleasenotifierprocessmanager.artist.dto.ArtistDto;
+import com.hvs.musicreleasenotifierprocessmanager.release.dto.ReleaseDto;
 import com.hvs.musicreleasenotifierprocessmanager.user.client.UserClient;
 import com.hvs.musicreleasenotifierprocessmanager.user.client.response.UserPageResponse;
 import com.hvs.musicreleasenotifierprocessmanager.user.dto.UserDto;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@SuppressWarnings("unused")
 public class NewReleasesProcessService {
     private static final Logger logger = LoggerFactory.getLogger(NewReleasesProcessService.class);
 
@@ -32,12 +35,8 @@ public class NewReleasesProcessService {
         runtimeService.startProcessInstanceByMessage(messageName);
     }
 
-    public void print(DelegateExecution execution) {
-        System.out.println("Blaaaaaaaaa");
-    }
-
     public void getUsers(DelegateExecution execution) throws IOException, InterruptedException {
-        List<String> fields = new ArrayList<String>();
+        List<String> fields = new ArrayList<>();
         fields.add("username");
         fields.add("artistIdList");
 
@@ -68,5 +67,21 @@ public class NewReleasesProcessService {
         }
 
         execution.setVariable("allUsers", allUsers);
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean hasArtists(DelegateExecution execution) {
+        List<ArtistDto> artistDataList = (List<ArtistDto>) execution.getVariable("artistDataList");
+        return !artistDataList.isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean hasAReleases(DelegateExecution execution) {
+        List<ReleaseDto> releaseDataList = (List<ReleaseDto>) execution.getVariable("artistReleaseList");
+        return !releaseDataList.isEmpty();
+    }
+
+    public void logFetchingErrors(DelegateExecution execution) {
+        logger.error("Error fetching data from {}, for user {}", execution.getVariable("artistId"), execution.getVariable("username"));
     }
 }
