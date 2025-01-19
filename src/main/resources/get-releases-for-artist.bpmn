@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1dd3f3v" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.26.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:collaboration id="Collaboration_1b56650">
+    <bpmn:participant id="GetReleasesForArtistParticipant" name="Get releases for artist" processRef="get-releases-for-artist" />
+  </bpmn:collaboration>
+  <bpmn:process id="get-releases-for-artist" name="get-releases-for-artist" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" camunda:asyncAfter="true">
+      <bpmn:outgoing>Flow_1cpxcr8</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1cpxcr8" sourceRef="StartEvent_1" targetRef="GetAllReleasesTask" />
+    <bpmn:sequenceFlow id="Flow_0wpwulv" sourceRef="GetAllReleasesTask" targetRef="Gateway_1rl1uym" />
+    <bpmn:serviceTask id="GetAllReleasesTask" name="Get all releases" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:expression="${getReleasesForArtistProcessService.getReleases(execution)}">
+      <bpmn:incoming>Flow_1cpxcr8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wpwulv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_0yai9ed" attachedToRef="GetAllReleasesTask">
+      <bpmn:outgoing>Flow_1weekcs</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1366rhw" errorRef="Error_0lds2zm" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1weekcs" sourceRef="Event_0yai9ed" targetRef="SendFailedMessageTask" />
+    <bpmn:sequenceFlow id="Flow_04rgw7p" sourceRef="SendFailedMessageTask" targetRef="Gateway_1rl1uym" />
+    <bpmn:sequenceFlow id="Flow_02pgy2t" sourceRef="Gateway_1rl1uym" targetRef="Event_00wgzy8" />
+    <bpmn:endEvent id="Event_00wgzy8">
+      <bpmn:incoming>Flow_02pgy2t</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_1rl1uym">
+      <bpmn:incoming>Flow_04rgw7p</bpmn:incoming>
+      <bpmn:incoming>Flow_0wpwulv</bpmn:incoming>
+      <bpmn:outgoing>Flow_02pgy2t</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="SendFailedMessageTask" name="Send failed artist id to parent process" camunda:asyncAfter="true" camunda:expression="${getReleasesForArtistProcessService.sendErrorMessage(execution, &#34;ReleaseDataErrorMessage&#34;)}">
+      <bpmn:incoming>Flow_1weekcs</bpmn:incoming>
+      <bpmn:outgoing>Flow_04rgw7p</bpmn:outgoing>
+    </bpmn:sendTask>
+  </bpmn:process>
+  <bpmn:error id="Error_0lds2zm" name="FetchReleasesError" errorCode="FetchReleasesError" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1b56650">
+      <bpmndi:BPMNShape id="Participant_0yvbs6x_di" bpmnElement="GetReleasesForArtistParticipant" isHorizontal="true">
+        <dc:Bounds x="170" y="52" width="590" height="318" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="220" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1c0515w_di" bpmnElement="GetAllReleasesTask">
+        <dc:Bounds x="330" y="137" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_00wgzy8_di" bpmnElement="Event_00wgzy8">
+        <dc:Bounds x="662" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1rl1uym_di" bpmnElement="Gateway_1rl1uym" isMarkerVisible="true">
+        <dc:Bounds x="535" y="152" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1huuwm5_di" bpmnElement="SendFailedMessageTask">
+        <dc:Bounds x="400" y="260" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1r3kbrm_di" bpmnElement="Event_0yai9ed">
+        <dc:Bounds x="312" y="199" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1cpxcr8_di" bpmnElement="Flow_1cpxcr8">
+        <di:waypoint x="256" y="177" />
+        <di:waypoint x="330" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wpwulv_di" bpmnElement="Flow_0wpwulv">
+        <di:waypoint x="430" y="177" />
+        <di:waypoint x="535" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1weekcs_di" bpmnElement="Flow_1weekcs">
+        <di:waypoint x="330" y="235" />
+        <di:waypoint x="330" y="300" />
+        <di:waypoint x="400" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04rgw7p_di" bpmnElement="Flow_04rgw7p">
+        <di:waypoint x="500" y="300" />
+        <di:waypoint x="560" y="300" />
+        <di:waypoint x="560" y="202" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02pgy2t_di" bpmnElement="Flow_02pgy2t">
+        <di:waypoint x="585" y="177" />
+        <di:waypoint x="662" y="177" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
