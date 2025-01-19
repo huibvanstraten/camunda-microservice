@@ -38,7 +38,7 @@
         <bpmn:incoming>Flow_0b5tbq1</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="Flow_033bgex" sourceRef="Event_0qck5uz" targetRef="SendFailedMessagSubProcessTask" />
-      <bpmn:sendTask id="SendFailedMessagSubProcessTask" name="Send  failed artistId to parent process" camunda:expression="${getArtistsForUserProcessService.sendMessage(execution, FetchArtistDataFailedMessage)}">
+      <bpmn:sendTask id="SendFailedMessagSubProcessTask" name="Send  failed artistId to parent process" camunda:expression="${getArtistsForUserProcessService.sendErrorMessage(execution, &#34;FetchArtistDataFailedMessage&#34;)}">
         <bpmn:incoming>Flow_033bgex</bpmn:incoming>
         <bpmn:outgoing>Flow_1qe1rtp</bpmn:outgoing>
       </bpmn:sendTask>
@@ -62,7 +62,7 @@
       <bpmn:outgoing>Flow_0gyvqdj</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1k5e0du" messageRef="Message_1lcaggk" />
     </bpmn:boundaryEvent>
-    <bpmn:sendTask id="SendFailedMessageTask" name="Send failed artistId to parent process" camunda:expression="${getArtistsForUserProcessService.sendMessage(execution, ArtistDataErrorMessage)}">
+    <bpmn:sendTask id="SendFailedMessageTask" name="Send failed artistId to parent process" camunda:expression="${getArtistsForUserProcessService.sendErrorMessage(execution, &#34;ArtistDataErrorMessage&#34;)}">
       <bpmn:incoming>Flow_0gyvqdj</bpmn:incoming>
       <bpmn:outgoing>Flow_1mjs6z5</bpmn:outgoing>
     </bpmn:sendTask>
@@ -83,16 +83,6 @@
       <bpmndi:BPMNShape id="Activity_0b0e090_di" bpmnElement="GetListsTask">
         <dc:Bounds x="250" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1jn41ia_di" bpmnElement="Gateway_1jn41ia" isMarkerVisible="true">
-        <dc:Bounds x="935" y="205" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1w6euts_di" bpmnElement="Event_1w6euts">
-        <dc:Bounds x="1062" y="212" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0967rho_di" bpmnElement="SendFailedMessageTask">
-        <dc:Bounds x="910" y="320" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_12a21nl_di" bpmnElement="ForEachArtistIdSubProces" isExpanded="true">
         <dc:Bounds x="390" y="130" width="450" height="310" />
         <bpmndi:BPMNLabel />
@@ -106,12 +96,12 @@
       <bpmndi:BPMNShape id="Event_17p6igw_di" bpmnElement="Event_17p6igw">
         <dc:Bounds x="752" y="212" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1weov31_di" bpmnElement="Gateway_1weov31" isMarkerVisible="true">
-        <dc:Bounds x="665" y="205" width="50" height="50" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1dbht3n_di" bpmnElement="SendFailedMessagSubProcessTask">
         <dc:Bounds x="640" y="320" width="100" height="80" />
         <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1weov31_di" bpmnElement="Gateway_1weov31" isMarkerVisible="true">
+        <dc:Bounds x="665" y="205" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1s5woon_di" bpmnElement="Event_0qck5uz">
         <dc:Bounds x="502" y="252" width="36" height="36" />
@@ -137,16 +127,30 @@
         <di:waypoint x="715" y="230" />
         <di:waypoint x="752" y="230" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Gateway_1jn41ia_di" bpmnElement="Gateway_1jn41ia" isMarkerVisible="true">
+        <dc:Bounds x="935" y="205" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1w6euts_di" bpmnElement="Event_1w6euts">
+        <dc:Bounds x="1062" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0967rho_di" bpmnElement="SendFailedMessageTask">
+        <dc:Bounds x="910" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_113433w_di" bpmnElement="Event_16wvv1z">
         <dc:Bounds x="822" y="422" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_19l38rl_di" bpmnElement="Flow_19l38rl">
-        <di:waypoint x="840" y="230" />
-        <di:waypoint x="935" y="230" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0h0a8rn_di" bpmnElement="Flow_0h0a8rn">
         <di:waypoint x="215" y="230" />
         <di:waypoint x="250" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16mlljx_di" bpmnElement="Flow_16mlljx">
+        <di:waypoint x="350" y="230" />
+        <di:waypoint x="390" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qu18ad_di" bpmnElement="Flow_1qu18ad">
+        <di:waypoint x="985" y="230" />
+        <di:waypoint x="1062" y="230" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0gyvqdj_di" bpmnElement="Flow_0gyvqdj">
         <di:waypoint x="840" y="458" />
@@ -154,17 +158,13 @@
         <di:waypoint x="960" y="470" />
         <di:waypoint x="960" y="400" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19l38rl_di" bpmnElement="Flow_19l38rl">
+        <di:waypoint x="840" y="230" />
+        <di:waypoint x="935" y="230" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1mjs6z5_di" bpmnElement="Flow_1mjs6z5">
         <di:waypoint x="960" y="320" />
         <di:waypoint x="960" y="255" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1qu18ad_di" bpmnElement="Flow_1qu18ad">
-        <di:waypoint x="985" y="230" />
-        <di:waypoint x="1062" y="230" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_16mlljx_di" bpmnElement="Flow_16mlljx">
-        <di:waypoint x="350" y="230" />
-        <di:waypoint x="390" y="230" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

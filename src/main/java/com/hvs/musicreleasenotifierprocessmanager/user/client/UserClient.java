@@ -3,7 +3,6 @@ package com.hvs.musicreleasenotifierprocessmanager.user.client;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.hvs.musicreleasenotifierprocessmanager.user.client.response.UserPageResponse;
 import com.hvs.musicreleasenotifierprocessmanager.user.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,27 +61,6 @@ public class UserClient {
             String responseBody = response.body();
 
             return objectMapper.readValue(responseBody, new TypeReference<>() {});
-        } else {
-            logger.error("Failed to fetch users. Status Code: {}, Body: {}", response.statusCode(), response.body());
-            throw new IOException("Failed to fetch users. Status Code: " + response.statusCode());
-        }
-    }
-
-
-    public UserPageResponse<UserDto> getUsersPaged(int page, int size) throws IOException, InterruptedException {
-        String uri = String.format("%s/paginated?page=%d&size=%d", CORE_BASE_URL + "/user", page, size);
-        HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(uri))
-                .header("Accept", "application/json")
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200) {
-            String responseBody = response.body();
-            return objectMapper.readValue(responseBody, new TypeReference<>() {
-            });
         } else {
             logger.error("Failed to fetch users. Status Code: {}, Body: {}", response.statusCode(), response.body());
             throw new IOException("Failed to fetch users. Status Code: " + response.statusCode());

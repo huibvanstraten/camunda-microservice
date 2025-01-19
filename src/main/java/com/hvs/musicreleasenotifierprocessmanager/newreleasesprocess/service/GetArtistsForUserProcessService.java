@@ -4,6 +4,7 @@ import com.hvs.musicreleasenotifierprocessmanager.artist.client.ArtistClient;
 import com.hvs.musicreleasenotifierprocessmanager.artist.dto.ArtistDto;
 import com.hvs.musicreleasenotifierprocessmanager.user.dto.UserDto;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,20 +39,21 @@ public class GetArtistsForUserProcessService {
     }
 
     @SuppressWarnings({"unchecked"})
-    public void getArtist(DelegateExecution execution) throws IOException, InterruptedException {
+    public void getArtist(DelegateExecution execution) {
         String artistId = (String) execution.getVariable("artistId");
-        ArtistDto artistData = artistClient.getArtist(artistId);
 
-        List<ArtistDto> artistDataList = (List<ArtistDto>) execution.getVariable("artistDataList");
-        artistDataList.add(artistData);
-        execution.setVariable("artistDataList", artistDataList);
+        try {
+            ArtistDto artistData = artistClient.getArtist(artistId);
 
-        for(ArtistDto artist : artistDataList) {
-            System.out.println(artist.getName());
+            List<ArtistDto> artistDataList = (List<ArtistDto>) execution.getVariable("artistDataList");
+            artistDataList.add(artistData);
+            execution.setVariable("artistDataList", artistDataList);
+        } catch (Exception e) {
+            throw new BpmnError("FetchArtistDataError", e);
         }
     }
 
-    public void message(DelegateExecution execution, String message) {
+    public void sendErrorMessage(DelegateExecution execution, String message) {
         runtimeService.createMessageCorrelation(message)
                 .processInstanceId(execution.getProcessInstanceId())
                 .setVariable("artistId", execution.getVariable("artistId"))
