@@ -40,6 +40,7 @@ public class NewReleasesProcessService {
 
     public void getUsers(DelegateExecution execution) throws IOException, InterruptedException {
         List<String> fields = new ArrayList<>();
+        fields.add("id");
         fields.add("username");
         fields.add("artistIdList");
 
@@ -77,6 +78,6 @@ public class NewReleasesProcessService {
     public void sendNewReleases(DelegateExecution execution) {
         List<String> releases = (List<String>) execution.getVariable("newReleases");
 
-        releases.forEach(releaseClient::sendNewRelease);
+            releases.forEach(releaseClient::sendNewRelease);
     }
 }

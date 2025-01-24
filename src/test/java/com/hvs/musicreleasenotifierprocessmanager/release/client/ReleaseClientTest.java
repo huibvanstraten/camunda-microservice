@@ -2,6 +2,8 @@ package com.hvs.musicreleasenotifierprocessmanager.release.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.hvs.musicreleasenotifierprocessmanager.keycloak.authorisation.response.TokenResponse;
+import com.hvs.musicreleasenotifierprocessmanager.keycloak.authorisation.service.KeycloakAuthorisationService;
 import com.hvs.musicreleasenotifierprocessmanager.release.dto.ReleaseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,17 +20,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+
 class ReleaseClientTest {
 
     private ReleaseClient releaseClient;
     private HttpClient mockHttpClient;
+    private final KeycloakAuthorisationService mockKeycloakAuthorisationService = mock(KeycloakAuthorisationService.class);
 
-    // Fake CORE_BASE_URL for tests.
     private final String coreBaseUrl = "http://localhost:8080";
+
+    private TokenResponse token;
 
     @BeforeEach
     void setUp() {
-        releaseClient = new ReleaseClient();
+        releaseClient = new ReleaseClient(
+                mockKeycloakAuthorisationService
+        );
 
         ReflectionTestUtils.setField(releaseClient, "CORE_BASE_URL", coreBaseUrl);
 
@@ -38,6 +45,9 @@ class ReleaseClientTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         ReflectionTestUtils.setField(releaseClient, "objectMapper", objectMapper);
+
+        token = new TokenResponse();
+        token.setAccessToken("");
     }
 
     @Test
@@ -93,6 +103,8 @@ class ReleaseClientTest {
                 .thenReturn(fakeResponsePage1)
                 .thenReturn(fakeResponsePage2);
 
+        when(mockKeycloakAuthorisationService.getToken()).thenReturn(token);
+
         List<ReleaseDto> result = releaseClient.getAllReleasesForArtist("artist123");
 
         assertThat(result).hasSize(2);
@@ -111,6 +123,8 @@ class ReleaseClientTest {
         when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(errorResponse);
 
+        when(mockKeycloakAuthorisationService.getToken()).thenReturn(token);
+
         assertThatThrownBy(() -> releaseClient.getAllReleasesForArtist("artist123"))
                 .isInstanceOf(IOException.class)
                 .hasMessageContaining("Failed to fetch releases. Status Code: 404");
@@ -122,6 +136,8 @@ class ReleaseClientTest {
     void sendNewRelease_callsHttpClientSend() throws Exception {
         // Given
         ReflectionTestUtils.setField(releaseClient, "CORE_BASE_URL", coreBaseUrl);
+
+        when(mockKeycloakAuthorisationService.getToken()).thenReturn(token);
 
         HttpResponse<String> fakeResponse = mock(HttpResponse.class);
         when(fakeResponse.statusCode()).thenReturn(200);

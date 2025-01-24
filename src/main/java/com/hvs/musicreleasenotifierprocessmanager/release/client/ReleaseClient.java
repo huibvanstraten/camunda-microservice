@@ -3,6 +3,7 @@ package com.hvs.musicreleasenotifierprocessmanager.release.client;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.hvs.musicreleasenotifierprocessmanager.keycloak.authorisation.service.KeycloakAuthorisationService;
 import com.hvs.musicreleasenotifierprocessmanager.release.client.response.ReleasePagedResponse;
 import com.hvs.musicreleasenotifierprocessmanager.release.dto.ReleaseDto;
 import org.slf4j.Logger;
@@ -28,17 +29,19 @@ public class ReleaseClient {
     @Value("${core.base-url}")
     private String CORE_BASE_URL;
 
+    private final KeycloakAuthorisationService keycloakAuthorisationService;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public ReleaseClient() {
+    public ReleaseClient(KeycloakAuthorisationService keycloakAuthorisationService) {
+        this.keycloakAuthorisationService = keycloakAuthorisationService;
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
     }
 
-
     public List<ReleaseDto> getAllReleasesForArtist(String artistId) throws IOException, InterruptedException {
+
         List<ReleaseDto> allReleases = new ArrayList<>();
         int offset = 0;
         int limit = 20;
@@ -46,11 +49,14 @@ public class ReleaseClient {
         String url = buildUrl(artistId, offset, limit);
 
         while (true) {
+            String token = keycloakAuthorisationService.getToken().getAccessToken();
+
             logger.info("Fetching releases from: {}", url);
             HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(URI.create(url))
                     .header("Accept", "application/json")
+                    .header("Authorization", "Bearer " + token)
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -58,7 +64,8 @@ public class ReleaseClient {
             if (response.statusCode() == 200) {
                 String body = response.body();
                 ReleasePagedResponse<ReleaseDto> page = objectMapper.readValue(
-                        body, new TypeReference<>() {}
+                        body, new TypeReference<>() {
+                        }
                 );
 
                 allReleases.addAll(page.getContent());
@@ -79,6 +86,9 @@ public class ReleaseClient {
     }
 
     public void sendNewRelease(String releaseId) {
+        try {
+        String token = keycloakAuthorisationService.getToken().getAccessToken();
+
         String newReleasesBaseUrl = CORE_BASE_URL + "/release/new";
         String uri = String.format("%s?releaseId=%s", newReleasesBaseUrl, releaseId);
 
@@ -86,14 +96,15 @@ public class ReleaseClient {
                 .GET()
                 .uri(URI.create(uri))
                 .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
                 .build();
 
-        try {
             httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (Exception e) {
+
+        } catch (IOException | InterruptedException e) {
             logger.error(e.getMessage());
         }
-        }
+    }
 
 
     private String buildUrl(String artistId, int offset, int limit) {

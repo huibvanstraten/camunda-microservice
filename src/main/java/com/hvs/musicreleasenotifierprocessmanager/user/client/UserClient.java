@@ -3,6 +3,7 @@ package com.hvs.musicreleasenotifierprocessmanager.user.client;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.hvs.musicreleasenotifierprocessmanager.keycloak.authorisation.service.KeycloakAuthorisationService;
 import com.hvs.musicreleasenotifierprocessmanager.user.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +24,24 @@ public class UserClient {
 
     private static final Logger logger = LoggerFactory.getLogger(UserClient.class);
 
+
     @Value("${core.base-url}")
     private String CORE_BASE_URL = "";
 
+    private final KeycloakAuthorisationService keycloakAuthorisationService;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public UserClient() {
+    public UserClient(KeycloakAuthorisationService keycloakAuthorisationService) {
+        this.keycloakAuthorisationService = keycloakAuthorisationService;
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     public List<UserDto> getUsersParametized(List<String> fields) throws IOException, InterruptedException {
+        String token = keycloakAuthorisationService.getToken().getAccessToken();
+
         StringBuilder uriBuilder = new StringBuilder(String.format("%s/parameters?", CORE_BASE_URL + "/user"));
 
         for (int i = 0; i < fields.size(); i++) {
@@ -53,6 +59,7 @@ public class UserClient {
                 .GET()
                 .uri(URI.create(uri))
                 .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());

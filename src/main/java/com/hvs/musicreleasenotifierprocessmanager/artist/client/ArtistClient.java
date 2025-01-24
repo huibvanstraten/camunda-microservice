@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hvs.musicreleasenotifierprocessmanager.artist.dto.ArtistDto;
+import com.hvs.musicreleasenotifierprocessmanager.keycloak.authorisation.service.KeycloakAuthorisationService;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,16 +25,20 @@ public class ArtistClient {
     @Value("${core.base-url}")
     private String CORE_BASE_URL = "";
 
+    private final KeycloakAuthorisationService keycloakAuthorisationService;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public ArtistClient() {
+    public ArtistClient(KeycloakAuthorisationService keycloakAuthorisationService) {
+        this.keycloakAuthorisationService = keycloakAuthorisationService;
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     public ArtistDto getArtist(String artistId) throws IOException, InterruptedException {
+        String token = keycloakAuthorisationService.getToken().getAccessToken();
+
         String artistBaseUrl = CORE_BASE_URL + "/artist";
         String uri = String.format("%s?artistId=%s", artistBaseUrl, artistId);
 
@@ -41,6 +46,7 @@ public class ArtistClient {
                 .GET()
                 .uri(URI.create(uri))
                 .header("Accept", "application/json")
+                .header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
