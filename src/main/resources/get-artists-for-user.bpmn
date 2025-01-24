@@ -30,15 +30,15 @@
         <bpmn:outgoing>Flow_0buusoj</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:sequenceFlow id="Flow_0buusoj" sourceRef="GetArtistDataTask" targetRef="Gateway_1weov31" />
-      <bpmn:boundaryEvent id="Event_0qck5uz" attachedToRef="GetArtistDataTask">
+      <bpmn:boundaryEvent id="FetchArtistDataErrorEvent" camunda:asyncAfter="true" attachedToRef="GetArtistDataTask">
         <bpmn:outgoing>Flow_033bgex</bpmn:outgoing>
         <bpmn:errorEventDefinition id="ErrorEventDefinition_1wu84eo" errorRef="Error_1eixchp" />
       </bpmn:boundaryEvent>
       <bpmn:endEvent id="Event_17p6igw">
         <bpmn:incoming>Flow_0b5tbq1</bpmn:incoming>
       </bpmn:endEvent>
-      <bpmn:sequenceFlow id="Flow_033bgex" sourceRef="Event_0qck5uz" targetRef="SendFailedMessagSubProcessTask" />
-      <bpmn:sendTask id="SendFailedMessagSubProcessTask" name="Send  failed artistId to parent process" camunda:expression="${getArtistsForUserProcessService.sendErrorMessage(execution, &#34;FetchArtistDataFailedMessage&#34;)}">
+      <bpmn:sequenceFlow id="Flow_033bgex" sourceRef="FetchArtistDataErrorEvent" targetRef="SendFailedMessagSubProcessTask" />
+      <bpmn:sendTask id="SendFailedMessagSubProcessTask" name="Send  failed artistId to parent process" camunda:asyncAfter="true" camunda:expression="${getArtistsForUserProcessService.sendErrorMessage(execution, &#34;FetchArtistDataFailedMessage&#34;)}">
         <bpmn:incoming>Flow_033bgex</bpmn:incoming>
         <bpmn:outgoing>Flow_1qe1rtp</bpmn:outgoing>
       </bpmn:sendTask>
@@ -62,7 +62,7 @@
       <bpmn:outgoing>Flow_0gyvqdj</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1k5e0du" messageRef="Message_1lcaggk" />
     </bpmn:boundaryEvent>
-    <bpmn:sendTask id="SendFailedMessageTask" name="Send failed artistId to parent process" camunda:expression="${getArtistsForUserProcessService.sendErrorMessage(execution, &#34;ArtistDataErrorMessage&#34;)}">
+    <bpmn:sendTask id="SendFailedMessageTask" name="Send failed artistId to parent process" camunda:asyncAfter="true" camunda:expression="${getArtistsForUserProcessService.sendErrorMessage(execution, &#34;ArtistDataErrorMessage&#34;)}">
       <bpmn:incoming>Flow_0gyvqdj</bpmn:incoming>
       <bpmn:outgoing>Flow_1mjs6z5</bpmn:outgoing>
     </bpmn:sendTask>
@@ -103,8 +103,8 @@
       <bpmndi:BPMNShape id="Gateway_1weov31_di" bpmnElement="Gateway_1weov31" isMarkerVisible="true">
         <dc:Bounds x="665" y="205" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1s5woon_di" bpmnElement="Event_0qck5uz">
-        <dc:Bounds x="502" y="252" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_1s5woon_di" bpmnElement="FetchArtistDataErrorEvent">
+        <dc:Bounds x="552" y="252" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_071k8au_di" bpmnElement="Flow_071k8au">
         <di:waypoint x="466" y="230" />
@@ -115,8 +115,8 @@
         <di:waypoint x="665" y="230" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_033bgex_di" bpmnElement="Flow_033bgex">
-        <di:waypoint x="520" y="288" />
-        <di:waypoint x="520" y="360" />
+        <di:waypoint x="570" y="288" />
+        <di:waypoint x="570" y="360" />
         <di:waypoint x="640" y="360" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1qe1rtp_di" bpmnElement="Flow_1qe1rtp">

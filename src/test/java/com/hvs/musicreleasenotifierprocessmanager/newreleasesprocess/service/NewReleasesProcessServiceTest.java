@@ -161,9 +161,9 @@ class NewReleasesProcessServiceTest {
         newReleasesProcessService.sendNewReleases(delegateExecution);
 
         // Then
-        verify(releaseClient, times(3)).sendNewRelease(anyString());
-        verify(releaseClient).sendNewRelease("r1");
-        verify(releaseClient).sendNewRelease("r2");
-        verify(releaseClient).sendNewRelease("r3");
+            verify(releaseClient, times(3)).sendNewRelease(anyString());
+            verify(releaseClient).sendNewRelease("r1");
+            verify(releaseClient).sendNewRelease("r2");
+            verify(releaseClient).sendNewRelease("r3");
     }
 }
